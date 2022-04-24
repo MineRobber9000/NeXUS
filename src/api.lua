@@ -3,18 +3,6 @@ local eightbitcolor = require"eightbitcolor"
 
 local api = {}
 
--- placeholder key function
-function api.key(vm)
-    local k = vm:checkstring(1)
-    vm:pop(1)
-    local ok, ret = pcall(function() return love.keyboard.isDown(k) end)
-    if ok then
-        vm:pushboolean(ret)
-        return 1
-    end
-    vm:error("error getting state of key %s: %s",k,ret)
-end
-
 -- graphics functions here
 function api.circ(vm)
     local x=tonumber(vm:checknumber(1))
