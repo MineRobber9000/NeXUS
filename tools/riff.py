@@ -23,7 +23,7 @@ class RiffOrListChunk(Chunk):
         data = bytearray()
         for chunk in self.chunks:
             data.extend(chunk.encode())
-            if len(data)&1: data.append(b'\x00')
+            if len(data)&1: data.append(0)
         return self.ckID.encode("ascii")+struct.pack("<I",len(data)+4)+self.form.encode("ascii")+data
 
 def parse_chunk(fp):
