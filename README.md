@@ -16,11 +16,9 @@ something like `lua54.dll` (Windows) or `liblua54.so` (Mac/Linux) so NeXUS can
 find it.
 
 In its current state, the easiest way to get coding with NeXUS is to change the
-code at the top of main.lua (what will eventually become the "no game loaded"
-screen). The block string in the variable `the_code_i_want_to_run` is your
-target, and the API docs are your friend (unless you're a maniac, in which case
-I suppose you could read the API implementations in `api.lua`, but I wouldn't
-recommend it if you want to keep your sanity).
+ROM that the game loads for the "no game loaded" screen. Write your code, then run
+it through `create_cart.py` to get a ROM. Replace `src/nogameloaded.rom` with your
+new ROM, and enjoy!
 
 [Matchup Pro]: https://somepx.itch.io/humble-fonts-free "links to the Humble Fonts Free collection which contains Matchup Pro"
 [Eeve Somepx]: https://twitter.com/somepx
