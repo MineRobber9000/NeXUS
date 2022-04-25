@@ -50,13 +50,13 @@ local function parse_chunk(blob)
         chunk.form_type = blob:fourcc()
         chunk.nested = {}
         local begin = blob.pos - 4
-        while blob.pos < begin + chunk.size do
+        while blob.pos < (begin + chunk.size) do
           tableinsert(chunk.nested, parse_chunk(blob))
         end
     else
         chunk.content = blob:split(chunk.size) -- split off a blob of `size` bytes
         -- I needed this for MCA loading so here it is
-        chunk.raw = stringsub(chunk.content.buffer,chunk.content.offset+chunk.content.pos,chunk.content.offset+chunk.content.pos+chunk.size)
+        chunk.raw = stringsub(chunk.content.buffer,chunk.content.offset+chunk.content.pos,chunk.content.offset+chunk.content.pos+chunk.size-1)
         blob:pad("word") -- Skip padding to the next word boundary
     end
     return chunk
@@ -76,7 +76,6 @@ local function parse_riff_file(f,form_type,form_error)
         close_fh=true
     end
     local blob = Blob.new(fh:read("*a"))
-    print(#blob.buffer)
     local riff = parse_riff(blob)
     if form_type then assert(riff.form_type==form_type,string.format(form_error,riff.form_type)) end
     if close_fh then fh:close() end

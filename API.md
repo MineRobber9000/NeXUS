@@ -34,6 +34,23 @@ Blue component:   10 = 2/3 = 0.66666667
 
 ## Graphics
 
+### Side note: graphics pages
+
+Graphics pages are passed into `create_cart.py` as the `--graphics` option, and
+are used as space from which you can declare sprites (see `define_spr` below).
+
+The ID assigned to each graphics page is the same as the 0-based index of the
+file in the list of files you passed to `create_cart.py`. For instance:
+
+```
+You ran:
+$ python create_cart.py --graphics primary.png secondary.png -- code.lua out.rom
+
+Your graphics pages are:
+[0] = primary.png
+[1] = secondary.png
+```
+
 ### circ
 
 ```lua
@@ -65,6 +82,14 @@ cls([color: color])
 ```
 
 Clears the screen to the given color (defaults to 00, black).
+
+### define_spr
+
+```lua
+define_spr(id: integer, x: integer, y: integer, w: integer, h: integer, [colorkey: color])
+```
+
+Defines a sprite based on a w-pixels by h-pixels subset of graphics page id at position (x,y), with optional transparency color colorkey. Returns the ID of the sprite (IDs start at 0 and increment).
 
 ### line
 
@@ -107,6 +132,19 @@ print(str: string, [x: number], [y: number], [color: color])
 ```
 
 Prints string `str` at (x,y) in the color `color`. Defaults to printing at (0,0) in white.
+
+### spr
+
+```lua
+spr(id: integer, x: number, y: number, scale: number, flip: integer, rotate: number)
+```
+
+Draws sprite id at (x,y), scaled with a factor of scale, flipped according to the bitmap below, and rotated `rotate` radians.
+
+|Bit|Flip (if set)|
+|---|-------------|
+|  0|Horizontally |
+|  1|Vertically   |
 
 ### textwidth
 

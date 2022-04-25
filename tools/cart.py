@@ -1,4 +1,4 @@
-import riff
+import riff, struct
 
 class CodeChunk(riff.Chunk):
     def __init__(self,code=''):
@@ -9,6 +9,23 @@ class CodeChunk(riff.Chunk):
     def __set_code(self,code):
         self.data = code.encode("utf-8")
     code = property(__get_code,__set_code)
+
+class GraphicsChunk(riff.Chunk):
+    def __init__(self,id=0,width=0,height=0,img_data=b''):
+        self.ckID = "GRPH"
+        self.id = id
+        self.width = width
+        self.height = height
+        self.img_data = img_data
+    @property
+    def data(self):
+        assert len(self.img_data)==(self.width*self.height), ""
+        return struct.pack("<III",self.id,self.width,self.height)+self.img_data
+    @classmethod
+    def from_data(cls,data):
+        id, width, height = struct.unpack("<III",data[:12])
+        img_data = data[12:]
+        return cls(id,width,height,img_data)
 
 class Cart(riff.RiffOrListChunk):
     def __init__(self,chunks=None):
@@ -21,6 +38,8 @@ class Cart(riff.RiffOrListChunk):
         ret = cls()
         for chunk in generic.chunks:
             if chunk.ckID=="CODE":
-                    chunk = CodeChunk(chunk.data)
+                chunk = CodeChunk(chunk.data)
+            elif chunk.ckID=="GRPH":
+                chunk = GraphicsChunk.from_data(chunk.data)
             ret.chunks.append(chunk)
         return ret

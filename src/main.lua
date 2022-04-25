@@ -21,11 +21,12 @@ end
 function love.run()
     love.graphics.setLineStyle("rough")
     love.graphics.setDefaultFilter("nearest")
-    cart = Cart.new("nogameloaded.rom")
+    vm.cart = Cart.new("nogameloaded.rom")
     vm.font = love.graphics.newFont("font.ttf",16)
     vm.canvas = love.graphics.newCanvas(320,240)
     vm:init()
-    vm:loadstring(cart.code)
+    vm:loadstring(vm.cart.code)
+    print(vm.cart.code)
     if vm:docall(0,0)>0 then
         error(vm:checkstring(-1))
     end

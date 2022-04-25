@@ -53,6 +53,39 @@ function api.cls(vm)
     return 0
 end
 
+function api.define_spr(vm)
+    local id = tonumber(vm:checkinteger(1))
+    local x = tonumber(vm:checkinteger(2))
+    local y = tonumber(vm:checkinteger(3))
+    local w = tonumber(vm:checkinteger(4))
+    local h = tonumber(vm:checkinteger(5))
+    local colorkey = tonumber(vm:optinteger(6,-1))
+    if not vm.cart.images[id] then vm:error("no such graphic with ID "..id) end
+    if x<0 or x>vm.cart.images[id]:getWidth() then vm:error("out of bounds X position") end
+    if y<0 or y>vm.cart.images[id]:getHeight() then vm:error("out of bounds Y position") end
+    if w<1 then vm:error("must have at least 1 width") end
+    if h<1 then vm:error("must have at least 1 height") end
+    if (x+w)>vm.cart.images[id]:getWidth() then vm:error("cannot build sprite from x position "..x.." with width "..w) end
+    if (y+h)>vm.cart.images[id]:getHeight() then vm:error("cannot build sprite from y position "..y.." with height "..h) end
+    local newimgdata = love.image.newImageData(w,h)
+    newimgdata:paste(vm.cart.images[id],0,0,x,y,w,h)
+    if colorkey>=0 then
+        for y=0,h-1 do
+            for x=0,w-1 do
+                local r,g,b,a = newimgdata:getPixel(x,y)
+                local c = eightbitcolor.to_nearest(r,g,b)
+                if c==colorkey then newimgdata:setPixel(x,y,0,0,0,0) end
+            end
+        end
+    end
+    if not vm.sprites then vm.sprites={} end
+    local nextspr = #vm.sprites
+    if vm.sprites[0] then nextspr=nextspr+1 end
+    vm.sprites[nextspr]=love.graphics.newImage(newimgdata)
+    vm:pushinteger(nextspr)
+    return 1
+end
+
 function api.line(vm)
     local x1 = math.floor(tonumber(vm:checknumber(1)))
     local y1 = math.floor(tonumber(vm:checknumber(2)))
@@ -162,6 +195,24 @@ function api.print(vm)
     local r, g, b = eightbitcolor.to_float(color)
     love.graphics.setColor(r,g,b,1)
     love.graphics.print(str,tonumber(x),tonumber(y))
+    return 0
+end
+
+function api.spr(vm)
+    local sprid = tonumber(vm:checkinteger(1))
+    local x = tonumber(vm:checknumber(2))
+    local y = tonumber(vm:checknumber(3))
+    local scale = tonumber(vm:optnumber(4,1))
+    local flip = bit.band(tonumber(vm:optinteger(5,0)),3)
+    local rotate = tonumber(vm:optnumber(6,0))
+    if not vm.sprites[sprid] then vm:error("invalid sprite "..sprid) end
+    local sx = scale
+    local sy = scale
+    if bit.band(flip,1)>0 then sx=-1*sx end
+    if bit.band(flip,2)>0 then sy=-1*sy end
+    local ox = vm.sprites[sprid]:getWidth()/2
+    local oy = vm.sprites[sprid]:getHeight()/2
+    love.graphics.draw(vm.sprites[sprid],x+ox,y+oy,rotate,sx,sy,ox,oy)
     return 0
 end
 
