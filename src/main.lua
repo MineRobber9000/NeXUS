@@ -26,7 +26,6 @@ function love.run()
     vm.canvas = love.graphics.newCanvas(320,240)
     vm:init()
     vm:loadstring(vm.cart.code)
-    print(vm.cart.code)
     if vm:docall(0,0)>0 then
         error(vm:checkstring(-1))
     end
