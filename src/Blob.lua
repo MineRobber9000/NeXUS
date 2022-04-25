@@ -84,7 +84,6 @@ Blob.unpack = function(self, formatstring, ...)
     -- Insert the current position
     table.insert(self.rollback_points, self.pos)
 
-    print(formatstring,#self.buffer,self.pos+self.offset)
     unpacked = {lib.unpack(formatstring,
         self.buffer, self.pos + self.offset)}
     -- The new position is the last entry of that table
