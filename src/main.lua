@@ -1,37 +1,8 @@
 require"errorhandler"
 local VM = require"api"
+local Cart = require"cart"
 
 vm = VM.new(true)
-
-local the_code_i_want_to_run = [[
-
-local title = "NeXUS"
-local subtitle = "Version "..version()
-local nogameloaded = "No game loaded"
-local tx = math.floor((320/2)-(textwidth(title)/2))
-local sx = math.floor((320/2)-(textwidth(subtitle)/2))
-local nx = math.floor((320/2)-(textwidth(nogameloaded)/2))
-
-local t=0
-function doframe()
-    cls(160)
-    print(title,tx,(240/3)-8)
-    print(subtitle,sx,(240/2)-8)
-    if (math.floor(t/30)%2)==0 then print(nogameloaded,nx,(240*2/3)-8) end
-    t=t+1
-    s = "(DEBUG) Buttons pressed: "
-    if btn(0) then s=s.."Up " end
-    if btn(1) then s=s.."Down " end
-    if btn(2) then s=s.."Left " end
-    if btn(3) then s=s.."Right " end
-    if btn(4) then s=s.."A " end
-    if btn(5) then s=s.."B " end
-    if btn(6) then s=s.."Select " end
-    if btn(7) then s=s.."Start " end
-    print(s)
-end
-
-]]
 
 -- Calls a function represented by a global variable
 -- Returns true if function successfully executed
@@ -50,10 +21,11 @@ end
 function love.run()
     love.graphics.setLineStyle("rough")
     love.graphics.setDefaultFilter("nearest")
+    cart = Cart.new("nogameloaded.rom")
     vm.font = love.graphics.newFont("font.ttf",16)
     vm.canvas = love.graphics.newCanvas(320,240)
     vm:init()
-    vm:loadstring(the_code_i_want_to_run)
+    vm:loadstring(cart.code)
     if vm:docall(0,0)>0 then
         error(vm:checkstring(-1))
     end
