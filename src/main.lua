@@ -48,8 +48,35 @@ function love.run()
 					end
                 elseif name == "keypressed" and a == "escape" then
     				return 0
-                elseif e == "keypressed" and a == "r" and love.keyboard.isDown("lctrl", "rctrl") then
-    				return "restart"
+                elseif name == "keypressed" and a == "r" and love.keyboard.isDown("lctrl", "rctrl") then
+                    vm.canvas:renderTo(function() love.graphics.clear() end)
+                    vm:init()
+                    vm:loadstring(vm.cart.code)
+                    if vm:docall(0,0)>0 then
+                        error(vm:checkstring(-1))
+                    end
+                elseif name == "filedropped" then
+                    a:open('r')
+                    local proxy = setmetatable({},{__index=function(t,k)
+                        if k=="read" then
+                            return function(this,n)
+                                if n=="*a" then n=nil end
+                                return (a[k](ret2,"string",n))
+                            end
+                        else
+                            return function(this,...)
+                                return a[k](ret2,...)
+                            end
+                        end
+                    end})
+                    vm.cart = Cart.new(a)
+                    a:close()
+                    vm.canvas:renderTo(function() love.graphics.clear() end)
+                    vm:init()
+                    vm:loadstring(vm.cart.code)
+                    if vm:docall(0,0)>0 then
+                        error(vm:checkstring(-1))
+                    end
 				end
 				love.handlers[name](a,b,c,d,e,f)
 			end
