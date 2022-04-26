@@ -73,6 +73,7 @@ long long luaL_optinteger(void *L, int arg, long long def);
 void *luaL_newstate(void);
 void luaL_requiref(void *L, const char *modname, lua_CFunction openf, int glb);
 void luaL_traceback(void *L, void *L1, const char *msg, int level);
+void lua_close (void *L);
 void lua_pushboolean(void *L, int b);
 void lua_pushcclosure(void *L, lua_CFunction fn, int upvalues);
 void lua_pushinteger(void *L, long long val);
@@ -202,7 +203,7 @@ local libs = {
 }
 function lua_State.new()
     local ret = setmetatable({["ptr"]=lualib.luaL_newstate(),["wrappers"]={}},lua_State)
-    ret.ptr=ffi.gc(ret.ptr,ffi.free)
+    ret.ptr=ffi.gc(ret.ptr,lualib.lua_close)
     for i=1,#libs do
         ret:requiref(libs[i][1],libs[i][2],1)
         ret:pop(1) -- remove lib from stack
