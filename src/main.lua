@@ -57,6 +57,8 @@ function love.run()
                     end
                 elseif name == "filedropped" then
                     a:open('r')
+                    -- this is needed to smooth over some gaps in love files vs
+                    -- base lua files
                     local proxy = setmetatable({},{__index=function(t,k)
                         if k=="read" then
                             return function(this,n)
