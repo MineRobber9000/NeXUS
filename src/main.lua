@@ -61,7 +61,7 @@ function love.run()
                         if k=="read" then
                             return function(this,n)
                                 if n=="*a" then n=nil end
-                                return (a[k](ret2,"string",n))
+                                return (a[k](a,"string",n))
                             end
                         else
                             return function(this,...)
@@ -69,7 +69,7 @@ function love.run()
                             end
                         end
                     end})
-                    vm.cart = Cart.new(a)
+                    vm.cart = Cart.new(proxy)
                     a:close()
                     vm.canvas:renderTo(function() love.graphics.clear() end)
                     vm:init()
