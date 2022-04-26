@@ -303,6 +303,7 @@ function VM.init(this)
     this.state = lua54.new()
     this.wrappers = {}
     this.wrappers_cb = {}
+    this.sprites = {}
     for k, v in pairs(api) do
         this:register(v,k)
     end
