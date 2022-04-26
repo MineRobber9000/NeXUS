@@ -15,10 +15,9 @@ yourself) and place it somewhere where your system will know to look for it
 something like `lua54.dll` (Windows) or `liblua54.so` (Mac/Linux) so NeXUS can
 find it.
 
-In its current state, the easiest way to get coding with NeXUS is to change the
-ROM that the game loads for the "no game loaded" screen. Write your code, then run
-it through `create_cart.py` to get a ROM. Replace `src/nogameloaded.rom` with your
-new ROM, and enjoy!
+In its current state, the easiest way to get coding with NeXUS is to drag and
+drop a ROM onto the window. Write your code, use `tools/create_cart.py` to make
+a cartridge of it, and then drag and drop it onto the NeXUS window to load it.
 
 [Matchup Pro]: https://somepx.itch.io/humble-fonts-free "links to the Humble Fonts Free collection which contains Matchup Pro"
 [Eeve Somepx]: https://twitter.com/somepx
