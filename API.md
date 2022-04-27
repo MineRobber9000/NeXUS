@@ -201,6 +201,14 @@ epoch() -> number
 
 Returns the number of seconds since the Unix epoch.
 
+### trace
+
+```lua
+trace(message: string)
+```
+
+Prints a message to the console. Useful for debugging.
+
 ### version
 
 ```lua

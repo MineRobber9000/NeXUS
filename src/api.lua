@@ -272,6 +272,11 @@ function api.epoch(vm)
     return 1
 end
 
+function api.trace(vm)
+    print(vm:checkstring(1))
+    return 0
+end
+
 function api.version(vm)
     vm:pushstring("Alpha")
     return 1
