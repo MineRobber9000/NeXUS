@@ -136,7 +136,7 @@ Prints string `str` at (x,y) in the color `color`. Defaults to printing at (0,0)
 ### spr
 
 ```lua
-spr(id: integer, x: number, y: number, scale: number, flip: integer, rotate: number)
+spr(id: integer, x: number, y: number, [scale: number, flip: integer, rotate: number])
 ```
 
 Draws sprite id at (x,y), scaled with a factor of scale, flipped according to the bitmap below, and rotated `rotate` radians.
