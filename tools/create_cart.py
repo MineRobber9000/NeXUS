@@ -14,7 +14,7 @@ output.chunks.append(cart.CodeChunk(args.code.read()))
 if args.graphics:
     id = 0
     for image in args.graphics:
-        im = Image.open(image)
+        im = Image.open(image).convert("RGBA")
         data = bytearray()
         for y in range(im.height):
             for x in range(im.width):
