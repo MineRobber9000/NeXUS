@@ -331,37 +331,4 @@ function VM.register(this,func,name)
     this:setglobal(name)
 end
 
-function VM.loadstring(this,str,name)
-    name = name or "[loaded code]"
-    this.state:loadbufferx(str,#str,name,"t")
-end
-
-local function messagehandler(L)
-    local this = lua54.c_to_lua(L)
-    msg = this:checkstring(1)
-    this:pop(1)
-    if not msg then
-        if (this:callmeta(1,"__tostring")>0)
-        and (this:type(-1)==4) then
-            -- tostring method and it returned a string
-            return 1 -- that's your error message right there
-        else
-            msg = "(error object is a "..ffi.string(this.state:typename(1)).." value)"
-        end
-    end
-    this:traceback(this.ptr,msg,1)
-    return 1
-end
-jit.off(messagehandler)
-local mh = require("ffi").cast("lua_CFunction",messagehandler)
-
-function VM.docall(this,nargs,nres)
-    base = this.state:gettop()-nargs
-    this.state:pushcclosure(mh,0)
-    this.state:insert(base)
-    local res = this.state:pcall(nargs,nres,base)
-    this.state:remove(base)
-    return res
-end
-
 return VM

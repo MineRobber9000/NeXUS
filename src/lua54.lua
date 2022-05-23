@@ -185,6 +185,44 @@ function lua_State.pcall(this,nargs,nresults,msgh)
     return this:pcallk(nargs,nresults,msgh,0,nil)
 end
 
+-- Loads a string as Lua 5.4 code
+function lua_State.loadstring(this,str,name)
+    name = name or "[loaded code]"
+    this.state:loadbufferx(str,#str,name,"t")
+end
+
+-- adds a stack trace to Lua 5.4 errors
+-- effectively a port to LuaJIT of the stock Lua interpreter's error handler
+local function messagehandler(L)
+    local this = lua_State.c_to_lua(L)
+    msg = this:checkstring(1)
+    this:pop(1)
+    if not msg then
+        if (this:callmeta(1,"__tostring")>0)
+        and (this:type(-1)==4) then
+            -- tostring method and it returned a string
+            return 1 -- that's your error message right there
+        else
+            msg = "(error object is a "..ffi.string(this.state:typename(1)).." value)"
+        end
+    end
+    this:traceback(this.ptr,msg,1)
+    return 1
+end
+jit.off(messagehandler)
+local mh = require("ffi").cast("lua_CFunction",messagehandler)
+
+-- calls the function on top of the stack with nargs arguments, returning nres
+-- results
+function lua_State.docall(this,nargs,nres)
+    base = this:gettop()-nargs
+    this:pushcclosure(mh,0)
+    this:insert(base)
+    local res = this:pcall(nargs,nres,base)
+    this:remove(base)
+    return res
+end
+
 function lua_State.nullify(this,name)
     this:pushnil()
     this:setglobal(name)
