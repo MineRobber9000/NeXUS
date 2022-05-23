@@ -5,7 +5,7 @@ local ffi=require"ffi"
 -- (set LD_LIBRARY_PATH to include the base directory)
 local lualib = ffi.load("lua54")
 
--- a lua_State object (C) will be stored in the table as this.L
+-- a lua_State object (C) will be stored in the table as this.ptr
 -- since I don't feel like defining the entire lua_State object, it's
 -- passed around as a void pointer (they use it as a pointer in all of the
 -- functions anyways)
