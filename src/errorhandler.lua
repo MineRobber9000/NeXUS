@@ -80,7 +80,9 @@ function love.errorhandler(msg)
 	end
 
 	if love.system then
-		p = p .. "\nPress Ctrl+C to copy this error or Ctrl+R to restart NEXUS"
+		p = p .. "\nPress Ctrl+C to copy this error or Ctrl+R to restart NeXUS"
+	else
+		p = p .. "\nPress Ctrl+R to restart NeXUS"
 	end
 
 	return function()
