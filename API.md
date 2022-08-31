@@ -86,7 +86,7 @@ Clears the screen to the given color (defaults to 00, black).
 ### define_spr
 
 ```lua
-define_spr(id: integer, x: integer, y: integer, w: integer, h: integer, [colorkey: color])
+define_spr(id: integer, x: integer, y: integer, w: integer, h: integer, [colorkey: color]) -> integer
 ```
 
 Defines a sprite based on a w-pixels by h-pixels subset of graphics page id at position (x,y), with optional transparency color colorkey. Returns the ID of the sprite (IDs start at 0 and increment).
