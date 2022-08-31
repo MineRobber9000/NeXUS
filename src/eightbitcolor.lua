@@ -4,6 +4,7 @@
 local eightbitcolor = {}
 
 function eightbitcolor.to_float(n)
+    n = bit.band(n,255)
     local r = bit.band(n,7)
     local g = bit.band(bit.rshift(n,3),7)
     local b = bit.band(bit.rshift(n,6),3)
@@ -24,7 +25,8 @@ function eightbitcolor.to_nearest(r,g,b)
 end
 
 function eightbitcolor.check(n)
-    return n>=0 and n<=255
+    --return n>=0 and n<=255
+    return true
 end
 
 return eightbitcolor
