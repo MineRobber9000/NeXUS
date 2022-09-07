@@ -372,6 +372,10 @@ function VM.init(this)
             v:free()
         end
     end
+    if rawget(this,"pcm_source") then
+        this.pcm_source:stop()
+        this.pcm_source:release()
+    end
     this.state = lua54.new()
     this.wrappers = {}
     this.wrappers_cb = {}
