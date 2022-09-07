@@ -25,10 +25,12 @@ if args.graphics:
                 bc = round((b/255)*3)
                 data.append((bc<<6)|(gc<<3)|(rc))
         output.chunks.append(cart.GraphicsChunk(id,im.width,im.height,data))
+        id+=1
 if args.binaries:
     id = 0
     for file in args.binaries:
         with open(file,"rb") as f:
             data = f.read()
         output.chunks.append(cart.BinaryChunk(id,data))
+        id+=1
 output.to_file(args.output)
