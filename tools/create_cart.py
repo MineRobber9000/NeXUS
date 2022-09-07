@@ -5,6 +5,7 @@ round = lambda v: math.floor(v+0.5)
 
 parser = argparse.ArgumentParser(description="Creates a NeXUS ROM/cart from input files.")
 parser.add_argument("--graphics",nargs="+",help="Graphics for the cart, stored with sequential IDs from 0 to n.")
+parser.add_argument("--binaries",nargs="+",help="Binary resources for the cart, stored with sequential IDs from 0 to n.")
 parser.add_argument("code",type=argparse.FileType('r'),help="The code for the cart.")
 parser.add_argument("output",type=argparse.FileType('wb'),help="Where the cart should be output.")
 args = parser.parse_args()
@@ -24,4 +25,10 @@ if args.graphics:
                 bc = round((b/255)*3)
                 data.append((bc<<6)|(gc<<3)|(rc))
         output.chunks.append(cart.GraphicsChunk(id,im.width,im.height,data))
+if args.binaries:
+    id = 0
+    for file in args.binaries:
+        with open(file,"rb") as f:
+            data = f.read()
+        output.chunks.append(cart.BinaryChunk(id,data))
 output.to_file(args.output)

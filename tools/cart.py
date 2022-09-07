@@ -27,6 +27,20 @@ class GraphicsChunk(riff.Chunk):
         img_data = data[12:]
         return cls(id,width,height,img_data)
 
+class BinaryChunk(riff.Chunk):
+    def __init__(self,id=0,raw_data=b''):
+        self.ckID = "BIN "
+        self.id = id
+        self.raw_data = raw_data
+    @property
+    def data(self):
+        return struct.pack("<I",id)+self.raw_data
+    @classmethod
+    def from_data(cls,data):
+        id = struct.unpack("<I",data[:4])
+        raw_data = data[4:]
+        return cls(id,raw_data)
+
 class Cart(riff.RiffOrListChunk):
     def __init__(self,chunks=None):
         super(Cart,self).__init__("RIFF","NXSR",chunks)
@@ -41,5 +55,7 @@ class Cart(riff.RiffOrListChunk):
                 chunk = CodeChunk(chunk.data)
             elif chunk.ckID=="GRPH":
                 chunk = GraphicsChunk.from_data(chunk.data)
+            elif chunk.ckID=="BIN ":
+                chunk = BinaryChunk.from_data(chunk.data)
             ret.chunks.append(chunk)
         return ret

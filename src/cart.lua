@@ -7,6 +7,7 @@ Cart.__index = Cart
 function Cart.handle_chunks(this,chunks)
     this.code = ""
     this.images = {}
+    this.resources = {}
     for i=1,#chunks do
         if chunks[i].id=="CODE" then
             this.code = this.code..chunks[i].raw
@@ -22,6 +23,10 @@ function Cart.handle_chunks(this,chunks)
                 end
             end
             this.images[id]=imgdata
+        elseif chunks[i].id=="BIN " then
+            local id = chunks[i].content:uint32()
+            local data = chunks[i].raw:sub(5)
+            this.resources[id] = data
         end
     end
 end
