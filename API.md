@@ -201,6 +201,14 @@ epoch() -> number
 
 Returns the number of seconds since the Unix epoch.
 
+### get_resource
+
+```lua
+get_resource(id: integer) -> string
+```
+
+Gets a binary resource. These are defined like graphics pages (see "Side note: graphics pages" above).
+
 ### trace
 
 ```lua

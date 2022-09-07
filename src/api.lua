@@ -272,6 +272,15 @@ function api.epoch(vm)
     return 1
 end
 
+function api.get_resource(vm)
+    local id = tonumber(vm:checkinteger(1))
+    if not vm.cart.resources[id] then
+        vm:error("no such resource "..id)
+    end
+    vm:pushstring(vm.cart.resources[id])
+    return 1
+end
+
 function api.trace(vm)
     print(vm:checkstring(1))
     return 0

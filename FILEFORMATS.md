@@ -20,3 +20,12 @@ Contains graphics data in a special format, for data starting at `n`:
 |n+C|Width * Height|Graphics (using 332 color format as described in the API doc)|
 
 The ID is used in the API to describe which graphics chunk data is being pulled from.
+
+### Binary chunks (FourCC: `BIN `)
+
+Contains read-only binary data to be used during the game. For data starting at `n`:
+
+|Start|Length|What|
+|-|-|-|
+|n|4|ID (u32)|
+|n+4|...|Binary data|
