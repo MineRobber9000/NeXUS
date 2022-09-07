@@ -277,7 +277,7 @@ function api.get_resource(vm)
     if not vm.cart.resources[id] then
         vm:error("no such resource "..id)
     end
-    vm:pushstring(vm.cart.resources[id])
+    vm:pushlstring(vm.cart.resources[id],#vm.cart.resources[id])
     return 1
 end
 

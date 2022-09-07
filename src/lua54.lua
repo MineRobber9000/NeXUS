@@ -48,6 +48,7 @@ int lua_getglobal(void *L, const char *name);
 const char *luaL_tolstring (void *L, int idx, size_t *len);
 const char *luaL_optlstring(void *L, int arg, const char *def, size_t size);
 const char *lua_pushstring(void *L, const char *s);
+const char *lua_pushlstring(void *L, const char *s, size_t len);
 const char *lua_typename(void *L, int tp);
 double luaL_checknumber(void *L, int arg);
 double luaL_optnumber(void *L, int arg, double def);
