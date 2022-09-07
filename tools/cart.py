@@ -34,7 +34,7 @@ class BinaryChunk(riff.Chunk):
         self.raw_data = raw_data
     @property
     def data(self):
-        return struct.pack("<I",id)+self.raw_data
+        return struct.pack("<I",self.id)+self.raw_data
     @classmethod
     def from_data(cls,data):
         id = struct.unpack("<I",data[:4])
