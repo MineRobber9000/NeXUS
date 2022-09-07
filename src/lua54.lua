@@ -189,7 +189,7 @@ end
 -- Loads a string as Lua 5.4 code
 function lua_State.loadstring(this,str,name)
     name = name or "[loaded code]"
-    this.state:loadbufferx(str,#str,name,"t")
+    return this.state:loadbufferx(str,#str,name,"t")
 end
 
 -- adds a stack trace to Lua 5.4 errors

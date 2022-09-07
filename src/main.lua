@@ -25,7 +25,9 @@ function love.run()
     vm.font = love.graphics.newFont("font.ttf",16)
     vm.canvas = love.graphics.newCanvas(320,240)
     vm:init()
-    vm:loadstring(vm.cart.code)
+    if vm:loadstring(vm.cart.code)>0 then
+        error(vm:checkstring(-1))
+    end
     if vm:docall(0,0)>0 then
         error(vm:checkstring(-1))
     end
@@ -75,7 +77,9 @@ function love.run()
                     a:close()
                     vm.canvas:renderTo(function() love.graphics.clear() end)
                     vm:init()
-                    vm:loadstring(vm.cart.code)
+                    if vm:loadstring(vm.cart.code)>0 then
+                        error(vm:checkstring(-1),0)
+                    end
                     if vm:docall(0,0)>0 then
                         error(vm:checkstring(-1))
                     end
