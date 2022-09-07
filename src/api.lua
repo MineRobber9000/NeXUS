@@ -254,6 +254,64 @@ function api.trib(vm)
 end
 -- end graphics functions
 
+-- sound functions
+function api.pcm_queue(vm)
+    vm:checktype(1,vm.LUA_TTABLE)
+    if vm.pcm_source:getFreeBufferCount()==0 then
+        vm:pushboolean(false)
+        return 1
+    end
+    i=1
+    tv=vm:geti(1,i)
+    local samples = {}
+    while tv~=0 do
+        local v = tonumber(vm:tointeger(-1))
+        vm:pop(1)
+        v = bit.band(v,255)
+        if bit.band(v,128)>0 then
+            v=-128+(bit.band(v,127))
+        end
+        v=(v/127)
+        if v<-1 then v=-1 end
+        if v>1 then v=1 end
+        samples[#samples+1]=v
+        i=i+1
+        tv=vm:geti(1,i)
+    end
+    vm:pop(1) -- pop nil value
+    local sounddata = love.sound.newSoundData(#samples,11025,8,1)
+    for i=1,#samples do
+        sounddata:setSample(i-1,samples[i])
+    end
+    vm:pushboolean(vm.pcm_source:queue(sounddata))
+    if not vm.pcm_source:isPlaying() then
+        vm.pcm_source:play()
+    end
+    return 1
+end
+
+function api.pcm_ready(vm)
+    vm:pushboolean(vm.pcm_source:getFreeBufferCount()>0)
+    return 1
+end
+
+function api.pcm_start(vm)
+    vm.pcm_source:play()
+    return 0
+end
+
+function api.pcm_stop(vm)
+    vm.pcm_source:pause()
+    return 0
+end
+
+function api.pcm_clear(vm)
+    vm.pcm_source:release()
+    vm.pcm_source = love.audio.newQueueableSource(11025,8,1)
+    return 0
+end
+-- end sound functions
+
 -- input functions
 local btnmapping = {[0]="up","down","left","right","z","x","lshift","return"}
 function api.btn(vm)
@@ -318,6 +376,8 @@ function VM.init(this)
     this.wrappers = {}
     this.wrappers_cb = {}
     this.sprites = {}
+    this.pcm_source = love.audio.newQueueableSource(11025,8,1)
+    this.pcm_source:setVolume(1.0)
     for k, v in pairs(api) do
         this:register(v,k)
     end

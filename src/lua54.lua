@@ -58,6 +58,7 @@ int lua_isfunction(void *L, int index);
 int luaL_loadstring(void *L, const char *s);
 int luaL_loadstring(void *L, const char *s);
 int luaL_loadbufferx(void *L, const char *buff, size_t sz, const char *name, const char *mode);
+int lua_geti(void *L, int idx, long long n);
 int lua_gettop(void *L);
 int lua_isstring(void *L, int idx);
 int lua_pcallk(void *L, int nargs, int nresults, int msgh, ptrdiff_t ctx, lua_KFunction k);
@@ -69,7 +70,9 @@ int luaopen_string(void *L);
 int luaopen_table(void *L);
 int luaopen_utf8(void *L);
 int lua_type(void *L, int index);
+long long lua_tointegerx(void *L, int index, int *isnum);
 long long luaL_checkinteger(void *L, int arg);
+void luaL_checktype(void *L, int arg, int t);
 long long luaL_optinteger(void *L, int arg, long long def);
 void *luaL_newstate(void);
 void luaL_requiref(void *L, const char *modname, lua_CFunction openf, int glb);
@@ -179,6 +182,10 @@ end
 
 function lua_State.tostring(this,index)
     return this:tolstring(index,0)
+end
+
+function lua_State.tointeger(this,index)
+    return this:tointegerx(index,nil)
 end
 
 -- Calls a function or callable object in protected mode.

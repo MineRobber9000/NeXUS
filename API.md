@@ -170,6 +170,69 @@ trib(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, col
 
 Draws a triangle with vertices {(x1,y1),(x2,y2),(x3,y3)} and color `color`, outlined.
 
+## Sound
+
+### pcm_queue
+
+```lua
+pcm_queue(samples: table) -> boolean
+```
+
+Queues PCM samples from the given table, and starts playing if the PCM channel was stopped. Samples are 11025Hz 8-bit mono.
+
+The code responsible for loading the samples functions as follows (`arg` being the sample table argument):
+
+```lua
+local samples = {}
+for i,v in ipairs(arg) do
+  -- convert input to 8 bit signed
+  v=(v&255)
+  if (v&128)>0 then
+    v=-128+(v~128)
+  end
+  -- convert 8 bit signed to float
+  v=(v/127)
+  if v<-1 then v=-1 end
+  if v>1 then v=1 end
+  samples[#samples+1]=v
+end
+-- `samples` now contains the samples to be queued
+```
+
+If `pcm_queue` returns false, then the samples could not be queued for whatever reason. It is unlikely that this condition will resolve before the frame is over, so games should reattempt `pcm_queue` on the next frame (or skip the `pcm_queue` invocation altogether).
+
+### pcm_ready
+
+```lua
+pcm_ready() -> boolean
+```
+
+Returns true if the PCM channel can take more samples.
+
+### pcm_start
+
+```lua
+pcm_start()
+```
+
+Attempts to start the PCM channel, if there are queued samples to play.
+
+### pcm_stop
+
+```lua
+pcm_stop()
+```
+
+Stops the PCM channel from playing.
+
+### pcm_clear
+
+```lua
+pcm_clear()
+```
+
+Clears the PCM channel of queued samples
+
 ## Input
 
 ### btn
