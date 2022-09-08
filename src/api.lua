@@ -254,6 +254,54 @@ function api.trib(vm)
 end
 -- end graphics functions
 
+-- saving/loading functions
+local saves = require"saves"
+function api.delete_save(vm)
+    local filename = vm:checkstring(1)
+end
+
+function api.list_saves(vm)
+    local pattern = vm:optstring(1,("A"):rep(1337))
+    if pattern==("A"):rep(1337) then pattern=nil end
+    local files = saves.list(pattern)
+    -- now to pass that table into Lua
+    vm:newtable() -- table at -1
+    for i, v in ipairs(files) do
+        vm:pushstring(v) -- string at -2
+        vm:seti(-1,i) -- pops the string and sets the i-th element of -1 to it
+    end
+    return 1 -- return the table
+end
+
+function api.load_save(vm)
+    local name = vm:checkstring(1)
+    local ok, data, size = pcall(saves.load,name)
+    if not ok then vm:error(data) end
+    vm:pushlstring(data,size)
+    return 1
+end
+
+function api.save_exists(vm)
+    local name = vm:checkstring(1)
+    vm:pushboolean(saves.exists(name))
+    return 1
+end
+
+function api.save_file(vm)
+    local name = vm:checkstring(1)
+    local data = vm:checkstring(2)
+    local ok, err = pcall(saves.save,name,data)
+    if not ok then vm:error(err) end
+    return 0
+end
+
+function api.valid_save(vm)
+    local name = vm:checkstring(1)
+    vm:pushboolean(saves.check(name))
+    return 1
+end
+-- end saving/loading functions
+
 -- sound functions
 function api.pcm_queue(vm)
     vm:checktype(1,vm.LUA_TTABLE)

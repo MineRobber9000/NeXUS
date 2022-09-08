@@ -39,11 +39,11 @@ end
 -- the CDEF block
 -- it's all of the functions we've imported from lua
 -- if you can't find it it's because it's supposed to be in here
--- sorted alphabetically
+-- sorted vaguely alphabetically
 ffi.cdef[[
 typedef int (*lua_CFunction)(void *L);
 typedef int (*lua_KFunction)(void *state, int status, ptrdiff_t ctx);
-const char *luaL_checklstring(void *L, int arg, size_t size);
+const char *luaL_checklstring(void *L, int arg, size_t* size);
 int lua_getglobal(void *L, const char *name);
 const char *luaL_tolstring (void *L, int idx, size_t *len);
 const char *luaL_optlstring(void *L, int arg, const char *def, size_t size);
@@ -53,12 +53,14 @@ const char *lua_typename(void *L, int tp);
 double luaL_checknumber(void *L, int arg);
 double luaL_optnumber(void *L, int arg, double def);
 int luaL_callmeta(void *L, int obj, const char *e);
+void lua_createtable(void *L, int narray, int nrec);
 int luaL_error (void *L, const char *fmt, ...);
 int lua_isfunction(void *L, int index);
 int luaL_loadstring(void *L, const char *s);
 int luaL_loadstring(void *L, const char *s);
 int luaL_loadbufferx(void *L, const char *buff, size_t sz, const char *name, const char *mode);
 int lua_geti(void *L, int idx, long long n);
+int lua_seti(void *L, int idx, long long n);
 int lua_gettop(void *L);
 int lua_isstring(void *L, int idx);
 int lua_pcallk(void *L, int nargs, int nresults, int msgh, ptrdiff_t ctx, lua_KFunction k);
@@ -113,15 +115,22 @@ function lua_State.pop(this,n)
     this:settop(-(n)-1)
 end
 
+function lua_State.newtable(this)
+    this:createtable(0,0)
+end
+
 -- Checks whether the function argument arg is a string and returns this string.
+local sizet_ptr = ffi.typeof("size_t[1]")
 function lua_State.checkstring(this,arg)
-    local ret = this:checklstring(arg,0)
-    if ret then return ffi.string(ret) end --better safe than sorry
+    local lenptr = sizet_ptr()
+    local ret = this:checklstring(arg,lenptr)
+    if ret then return ffi.string(ret,lenptr[0]) end --better safe than sorry
 end
 
 function lua_State.optstring(this,arg,def)
-    local ret = this:optlstring(arg,def,0)
-    if ret then return ffi.string(ret) end --better safe than sorry
+    local lenptr = sizet_ptr()
+    local ret = this:optlstring(arg,def,lenptr)
+    if ret then return ffi.string(ret,lenptr[0]) end --better safe than sorry
 end
 
 function lua_State.insert(this,idx)

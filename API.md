@@ -254,6 +254,70 @@ Gets the current state of the button with ID `id`.
 | 6|Select|Left shift      |
 | 7|Start |Enter           |
 
+## Saving/loading
+
+### Side note: file names
+
+NeXUS enforces the POSIX portable file name character set. This character set includes:
+
+ - All uppercase and lowercase Latin letters
+ - Numbers 0 to 9
+ - The period (.)
+ - The hyphen (-)
+ - The underscore (_)
+
+Attempting to use a character that is not in this set in a filename will cause an error.
+
+Saves are stored as `name.nxsv` files in the NeXUS save directory. For instance, `load_save("electronico")` will load the data stored in file `electronico.nxsv`.
+
+### delete_save
+
+```lua
+delete_save(filename: string)
+```
+
+Deletes the save file with name `filename`.
+
+### list_saves
+
+```lua
+list_saves([pattern: string]) -> table
+```
+
+Returns a table of saves that match the pattern `pattern`. The default pattern is `.+`, which matches any string (in effect, listing all of the saves).
+
+### load_save
+
+```lua
+load_save(filename: string) -> string
+```
+
+Loads the save file with name `filename`. Returns a string.
+
+### save_exists
+
+```lua
+save_exists(filename: string) -> boolean
+```
+
+Checks whether or not the save file with the name `filename` exists. Unlike the other saving/loading functions, giving an invalid filename to this function will not error; however, the function will always return false for a filename with illegal characters.
+
+### save_file
+
+```lua
+save_file(filename: string, data: string)
+```
+
+Saves `data` to save file `filename`.
+
+### valid_save
+
+```lua
+valid_save(filename: string) -> boolean
+```
+
+Checks whether the filename `filename` is valid.
+
 ## Utility functions
 
 ### epoch

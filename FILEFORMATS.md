@@ -29,3 +29,15 @@ Contains read-only binary data to be used during the game. For data starting at 
 |-|-|-|
 |n|4|ID (u32)|
 |n+4|...|Binary data|
+
+## NeXUS Save
+
+The NeXUS save format is used to save data of arbitrary size.
+
+|Start|Length|What|
+|-|-|-|
+|0|3|"NSV" literal|
+|3|1|Save file format version (currently 0)|
+|4|...|Save data|
+
+The save file format version is currently 0; increased save file format versions may include additional information in the header, but no other versions are defined at this time.
