@@ -206,3 +206,6 @@ cython_debug/
 
 # Lua 5.4 DLL (it might be in here so just in case)
 lua54.dll
+
+# my start.bat script (it won't apply to basically anyone else so I'm making sure it won't get committed)
+start.bat
