@@ -258,6 +258,9 @@ end
 local saves = require"saves"
 function api.delete_save(vm)
     local filename = vm:checkstring(1)
+    local ok, err = pcall(saves.delete,name)
+    if not ok then vm:error(err) end
+    return 0
 end
 
 function api.list_saves(vm)
