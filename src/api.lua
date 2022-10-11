@@ -59,7 +59,6 @@ function api.define_spr(vm)
     local y = tonumber(vm:checkinteger(3))
     local w = tonumber(vm:checkinteger(4))
     local h = tonumber(vm:checkinteger(5))
-    local colorkey = tonumber(vm:optinteger(6,-1))
     if not vm.cart.images[id] then vm:error("no such graphic with ID "..id) end
     if x<0 or x>vm.cart.images[id]:getWidth() then vm:error("out of bounds X position") end
     if y<0 or y>vm.cart.images[id]:getHeight() then vm:error("out of bounds Y position") end
@@ -69,7 +68,8 @@ function api.define_spr(vm)
     if (y+h)>vm.cart.images[id]:getHeight() then vm:error("cannot build sprite from y position "..y.." with height "..h) end
     local newimgdata = love.image.newImageData(w,h)
     newimgdata:paste(vm.cart.images[id],0,0,x,y,w,h)
-    if colorkey>=0 then
+    if not vm:isnoneornil(6) then
+        local colorkey = tonumber(vm:checkinteger(6))
         for y=0,h-1 do
             for x=0,w-1 do
                 local r,g,b,a = newimgdata:getPixel(x,y)
@@ -145,7 +145,6 @@ end
 function api.pix(vm)
     local x = tonumber(vm:checkinteger(1))
     local y = tonumber(vm:checkinteger(2))
-    local color = tonumber(vm:optinteger(3,-1))
     -- THIS FUNCTION IS VERY HACKY
     -- it is *not* performant, it is *not* something you should be doing
     -- basically we keep an imagedata around until one of the other functions
@@ -154,7 +153,7 @@ function api.pix(vm)
     -- so if you have to do full screen per-pixel effects (most of the time you
     -- don't), read all of the pixels you need and THEN manipulate them
     -- writes are fast, reads are not (unless you do all of the reads at once)
-    if color==-1 then
+    if vm:isnoneornil(3) then
         -- pull down the imagedata if we don't have it
         if not vm.imagedata then
             local sx,sy,sw,sh = love.graphics.getScissor()
@@ -171,6 +170,7 @@ function api.pix(vm)
         vm:pushinteger(eightbitcolor.to_nearest(vm.imagedata:getPixel(x,y)))
         return 1
     else
+        local color = tonumber(vm:checkinteger(3))
         if not eightbitcolor.check(color) then vm:error("invalid color "..tostring(color)) end
         -- get the color in RGB 0-1
         local r,g,b = eightbitcolor.to_float(color)
@@ -264,8 +264,10 @@ function api.delete_save(vm)
 end
 
 function api.list_saves(vm)
-    local pattern = vm:optstring(1,("A"):rep(1337))
-    if pattern==("A"):rep(1337) then pattern=nil end
+    local pattern = nil
+    if not vm:isnoneornil(1) then
+        pattern = vm:checkstring(1)
+    end
     local files = saves.list(pattern)
     -- now to pass that table into Lua
     vm:newtable() -- table at -1
