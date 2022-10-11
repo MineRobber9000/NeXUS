@@ -1,9 +1,151 @@
 local lua54 = require"lua54"
 local eightbitcolor = require"eightbitcolor"
+local ffi = require"ffi"
 
 local api = {}
 
 -- graphics functions here
+ffi.cdef[[
+typedef struct { uint8_t r, g, b, a; } rgba8_pixel;
+typedef struct { uint64_t width, height; rgba8_pixel *pixels; } canvas;
+]]
+function api.canvas(vm)
+    local w=tonumber(vm:checkinteger(1))
+    local h=tonumber(vm:checkinteger(2))
+    local x, y
+    if not vm:isnoneornil(3) then
+        x = tonumber(vm:checkinteger(3))
+        y = tonumber(vm:checkinteger(4))
+    end
+    print(1)
+    local imgdata=love.image.newImageData(w,h,"rgba8")
+    vm._canvases[#vm._canvases+1]=imgdata -- prevent imgdata from being GC'd (until necessary)
+    vm._canvases_image[#vm._canvases]=love.graphics.newImage(imgdata)
+    -- userdata at -1
+    local userdata=ffi.cast("canvas*",vm:newuserdata(ffi.sizeof("canvas"),2))[0]
+    print(2)
+    -- push the index of the imgdata (index at -2)
+    vm:pushinteger(#vm._canvases)
+    print(" 1")
+    -- set uservalue (pops index)
+    vm:setiuservalue(-1,1)
+    print(" 2")
+    print(3)
+    userdata.width=w
+    print(" 1")
+    userdata.height=h
+    print(" 2")
+    userdata.pixels=imgdata:getFFIPointer()
+    print(" 3")
+    print(4)
+    -- metatable at -2 if it exists
+    if vm:getmetatable("NeXUS.canvas")==vm.LUA_TNIL then
+        -- pop nil value
+        vm:pop(1)
+        -- metatable at -2
+        vm:newmetatable("NeXUS.canvas")
+        -- "__index" at -3
+        vm:pushstring("__index")
+        -- index table at -4
+        vm:newtable()
+        -- canvas:clear()
+        local function clear(L)
+            L = lua54.c_to_lua(L)
+            local canvas = ffi.cast("canvas*",L:checkudata(1,"NeXUS.canvas"))[0]
+            L:getiuservalue(canvas,1) -- uservalue at -1
+            local i = L:tointeger(-1)
+            L:pop(1) -- pop uservalue
+            local imgdata = vm._canvases[i]
+            ffi.fill(imgdata:getFFIPointer(),imgdata:getSize())
+            return 0
+        end
+        vm.wrappers["_canvas_clear"]=clear
+        local _clear = ffi.cast("lua_CFunction",clear)
+        vm.wrappers_cb["_canvas_clear"]=_clear
+        vm:pushstring("clear") -- name at -5
+        vm:pushcclosure(_clear,0) -- closure at -6
+        vm:settable(-4) -- pops name and closure
+        -- canvas:draw()
+        local function draw(L)
+            L = lua54.c_to_lua(L)
+            local canvas = ffi.cast("canvas*",L:checkudata(1,"NeXUS.canvas"))[0]
+            local x = tonumber(L:checkinteger(2))
+            local y = tonumber(L:checkinteger(3))
+            L:getiuservalue(canvas,1) -- uservalue at -1
+            local i = L:tointeger(-1)
+            L:pop(1) -- pop uservalue
+            local imgdata = vm._canvases[i]
+            local image = vm._canvases_image[i]
+            image:replacePixels(imgdata)
+            love.graphics.setColor(1,1,1,1)
+            love.graphics.draw(image,x,y)
+            return 0
+        end
+        vm.wrappers["_canvas_draw"]=draw
+        local _draw = ffi.cast("lua_CFunction",draw)
+        vm.wrappers_cb["_canvas_draw"]=_draw
+        vm:pushstring("draw") -- name at -5
+        vm:pushcclosure(_draw,0) -- closure at -6
+        vm:settable(-4) -- pops name and closure
+        -- canvas:pix()
+        local function pix(L)
+            L = lua54.c_to_lua(L)
+            local canvas = ffi.cast("canvas*",L:checkudata(1,"NeXUS.canvas"))[0]
+            local x = tonumber(L:checkinteger(2))
+            local y = tonumber(L:checkinteger(3))
+            if L:isnoneornil(4) then
+                if x<0 or y<0 or x>(canvas.width-1) or y>(canvas.height-1) then
+                    L:pushinteger(0)
+                    return 1
+                end
+                local pixel = canvas.pixels[(y*canvas.width)+x]
+                L:pushinteger(eightbitcolor.to_nearest(pixel.r/255,pixel.g/255,pixel.b/255))
+                return 1
+            else
+                if x<0 or y<0 or x>(canvas.width-1) or y>(canvas.height-1) then
+                    return 0
+                end
+                local color = tonumber(L:checkinteger(4))
+                local r,g,b = eightbitcolor.to_float(color)
+                local pixel = canvas.pixels[(y*canvas.width)+x]
+                pixel.r=math.floor((r*255)+0.5)
+                pixel.g=math.floor((g*255)+0.5)
+                pixel.b=math.floor((b*255)+0.5)
+                pixel.a=255
+                return 0
+            end
+        end
+        vm.wrappers["_canvas_pix"]=pix
+        local _pix = ffi.cast("lua_CFunction",pix)
+        vm.wrappers_cb["_canvas_pix"]=_pix
+        vm:pushstring("pix") -- name at -5
+        vm:pushcclosure(_pix,0) -- closure at -6
+        vm:settable(-4) -- pops name and closure
+        -- sets index table, pops key and value
+        vm:settable(-2)
+        -- "__gc" at -3
+        vm:pushstring("__gc")
+        -- canvas gc function
+        local function gc(L)
+            L = lua54.c_to_lua(L)
+            local canvas = ffi.cast("canvas*",L:checkudata(1,"NeXUS.canvas"))[0]
+            L:getiuservalue(canvas,1) -- uservalue at -1
+            local i = L:tointeger(-1)
+            L:pop(1) -- pop uservalue
+            vm._canvases[i]:release()
+            vm._canvases_image[i]:release()
+            return 0
+        end
+        vm.wrappers["_canvas_gc"]=gc
+        local _gc = ffi.cast("lua_CFunction",gc)
+        vm:pushcclosure(_gc,0) -- closure at -4
+        -- sets gc method, pops key and value
+        vm:settable(-2)
+    end
+    vm:setmetatable(-1)
+    return 1
+end
+
 function api.circ(vm)
     local x=tonumber(vm:checknumber(1))
     local y=tonumber(vm:checknumber(2))
@@ -433,6 +575,8 @@ function VM.init(this)
     this.wrappers = {}
     this.wrappers_cb = {}
     this.sprites = {}
+    this._canvases = {}
+    this._canvases_image = {}
     this.pcm_source = love.audio.newQueueableSource(11025,8,1)
     this.pcm_source:setVolume(1.0)
     for k, v in pairs(api) do
@@ -449,7 +593,7 @@ function VM.register(this,func,name)
             return (func(this) or error("Registered function "..name.." is missing a return statement!",2))
         end
         jit.off(this.wrappers[func])
-        this.wrappers_cb[func]=require("ffi").cast("lua_CFunction",this.wrappers[func])
+        this.wrappers_cb[func]=ffi.cast("lua_CFunction",this.wrappers[func])
     end
     --this is where we would register it via lua_State.register
     --instead since we've already created a wrapper, we'll manually register it
