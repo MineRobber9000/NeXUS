@@ -37,6 +37,8 @@ function love.run()
     love.graphics.push()
     local sx, sy, sw, sh = nil, nil, nil, nil
     local first = true
+    local showFPS = false
+    local fpsFont = love.graphics.newFont("font.ttf",32)
     love.timer.step()
 	-- Main loop time.
 	return function()
@@ -57,6 +59,8 @@ function love.run()
                     if vm:docall(0,0)>0 then
                         error(vm:checkstring(-1))
                     end
+                elseif name == "keypressed" and a == "f" and love.keyboard.isDown("lctrl", "rctrl") then
+                    showFPS = not showFPS
                 elseif name == "filedropped" then
                     a:open('r')
                     -- this is needed to smooth over some gaps in love files vs
@@ -101,6 +105,7 @@ function love.run()
         love.graphics.setCanvas()
         love.graphics.setColor(1,1,1,1)
         love.graphics.draw(vm.canvas,0,0,0,3,3)
+        if showFPS then love.graphics.setFont(fpsFont) love.graphics.print("FPS: "..love.timer.getFPS(),1,1) end
         love.graphics.present()
 
         love.timer.step()
