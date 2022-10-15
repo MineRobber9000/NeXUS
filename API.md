@@ -59,7 +59,7 @@ canvas(w: integer, h: integer, [x: integer, y: integer]) -> canvas
 
 Returns a canvas. Canvases are faster at pixel manipulation, at the cost of
 lacking certain drawing features. The optional x and y arguments are to
-initialize the canvas with pixels from the canvas (out-of-range pixels are
+initialize the canvas with pixels from the screen (out-of-range pixels are
 filled with black).
 
 NOTE: Canvases are currently broken; attempting to create one will cause NeXUS
