@@ -62,9 +62,6 @@ lacking certain drawing features. The optional x and y arguments are to
 initialize the canvas with pixels from the screen (out-of-range pixels are
 filled with black).
 
-NOTE: Canvases are currently broken; attempting to create one will cause NeXUS
-to crash. Currently working on a fix.
-
 ### canvas_clear
 
 ```lua
