@@ -11,6 +11,11 @@ function eightbitcolor.to_float(n)
     return r/7, g/7, b/3
 end
 
+function eightbitcolor.to_float_with_alpha(n)
+    local r, g, b = eightbitcolor.to_float(n)
+    return r, g, b, 1
+end
+
 function eightbitcolor.to_nearest(r,g,b)
     local rb = math.floor((r*7)+0.5)
     local gb = math.floor((g*7)+0.5)

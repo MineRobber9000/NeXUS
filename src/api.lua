@@ -7,7 +7,7 @@ local api = {}
 -- graphics functions here
 ffi.cdef[[
 typedef struct { uint8_t r, g, b, a; } rgba8_pixel;
-typedef struct { uint64_t width, height; rgba8_pixel *pixels; } canvas;
+typedef struct { uint64_t width, height; uint8_t *pixels; } canvas;
 ]]
 function api.canvas_new(vm)
     local w=tonumber(vm:checkinteger(1))
@@ -38,10 +38,12 @@ function api.canvas_new(vm)
         imgdata:paste(vm.imagedata,0,0,x,y,w,h)
     end
     local canvas=ffi.new("canvas")
+    local pixelholder=ffi.new("uint8_t[?]",w*h)
     canvas.width = w
     canvas.height = h
-    canvas.pixels = imgdata:getFFIPointer()
+    canvas.pixels = pixelholder
     vm._canvases_raw[nextind]=canvas
+    vm._canvases_pixels[nextind]=pixelholder
     vm:pushinteger(nextind)
     return 1
 end
@@ -49,7 +51,9 @@ end
 function api.canvas_clear(vm)
     local id = tonumber(vm:checknumber(1))
     if not vm._canvases[id] then vm:error("cannot clear non-existent canvas") end
+    local canvas = vm._canvases_raw[id]
     local imgdata = vm._canvases[id]
+    ffi.fill(canvas.pixels,canvas.width*canvas.height)
     ffi.fill(imgdata:getFFIPointer(),imgdata:getSize())
     return 0
 end
@@ -57,6 +61,7 @@ end
 function api.canvas_close(vm)
     local id = tonumber(vm:checknumber(1))
     if not vm._canvases[id] then vm:error("cannot free non-existent canvas") end
+    vm._canvases_pixels[id]=nil
     vm._canvases_raw[id]=nil
     vm._canvases[id]:release()
     vm._canvases[id]=nil
@@ -70,8 +75,12 @@ function api.canvas_draw(vm)
     if not vm._canvases[id] then vm:error("cannot draw non-existent canvas") end
     local x = tonumber(vm:checkinteger(2))
     local y = tonumber(vm:checkinteger(3))
+    local canvas = vm._canvases_raw[id]
     local imgdata = vm._canvases[id]
     local image = vm._canvases_image[id]
+    imgdata:mapPixel(function(x,y)
+        return eightbitcolor.to_float_with_alpha(canvas.pixels[(y*canvas.width)+x])
+    end)
     image:replacePixels(imgdata)
     love.graphics.setColor(1,1,1,1)
     love.graphics.draw(image,x,y)
@@ -89,20 +98,14 @@ function api.canvas_pix(vm)
             vm:pushinteger(0)
             return 1
         end
-        local pixel = canvas.pixels[(y*canvas.width)+x]
-        vm:pushinteger(eightbitcolor.to_nearest(pixel.r/255,pixel.g/255,pixel.b/255))
+        vm:pushinteger(tonumber(canvas.pixels[(y*canvas.width)+x]))
         return 1
     else
         if x<0 or y<0 or x>(canvas.width-1) or y>(canvas.height-1) then
             return 0
         end
         local color = tonumber(vm:checkinteger(4))
-        local r,g,b = eightbitcolor.to_float(color)
-        local pixel = canvas.pixels[(y*canvas.width)+x]
-        pixel.r=math.floor((r*255)+0.5)
-        pixel.g=math.floor((g*255)+0.5)
-        pixel.b=math.floor((b*255)+0.5)
-        pixel.a=255
+        canvas.pixels[(y*canvas.width)+x] = color
         return 0
     end
 end
@@ -536,6 +539,7 @@ function VM.init(this)
     this.wrappers = {}
     this.wrappers_cb = {}
     this.sprites = {}
+    this._canvases_pixels = {}
     this._canvases_raw = {}
     this._canvases = {}
     this._canvases_image = {}
