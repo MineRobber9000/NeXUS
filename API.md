@@ -79,6 +79,12 @@ Clears the canvas.
 canvas_close(id: integer)
 ```
 
+Closes the canvas, freeing all resources connected to it. Any attempt to use a
+canvas after closing it will cause an error.
+
+Note that if a new canvas is created, it may be reassigned the same number as a
+previously closed canvas.
+
 ### canvas_draw
 
 ```lua
