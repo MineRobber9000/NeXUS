@@ -89,13 +89,6 @@ void lua_pushnumber(void *L, double val);
 void lua_rotate(void *L, int index, int n);
 void lua_setglobal(void *L, const char *name);
 void lua_settop(void *L, int n);
-int luaL_getmetatable (void *L, const char *tname);
-int luaL_newmetatable (void *L, const char *tname);
-void *luaL_checkudata (void *L, int arg, const char *tname);
-void lua_settable (void *L, int index);
-void lua_setmetatable (void *L, int index);
-int lua_setiuservalue (void *L, int index, int n);
-int lua_getiuservalue (void *L, int index, int n);
 ]]
 
 -- registers function fn with name name

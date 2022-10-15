@@ -51,13 +51,13 @@ Your graphics pages are:
 [1] = secondary.png
 ```
 
-### canvas
+### canvas_new
 
 ```lua
-canvas(w: integer, h: integer, [x: integer, y: integer]) -> canvas
+canvas_new(w: integer, h: integer, [x: integer, y: integer]) -> integer
 ```
 
-Returns a canvas. Canvases are faster at pixel manipulation, at the cost of
+Returns a canvas ID. Canvases are faster at pixel manipulation, at the cost of
 lacking certain drawing features. The optional x and y arguments are to
 initialize the canvas with pixels from the screen (out-of-range pixels are
 filled with black).
@@ -65,31 +65,37 @@ filled with black).
 NOTE: Canvases are currently broken; attempting to create one will cause NeXUS
 to crash. Currently working on a fix.
 
-#### canvas:clear
+### canvas_clear
 
 ```lua
-canvas:clear()
+canvas_clear(id: integer)
 ```
 
 Clears the canvas.
 
-#### canvas:draw
+### canvas_close
 
 ```lua
-canvas:draw(x: integer, y: integer)
+canvas_close(id: integer)
+```
+
+### canvas_draw
+
+```lua
+canvas_draw(id: integer, x: integer, y: integer)
 ```
 
 Draws the canvas to the screen.
 
-#### canvas:pix
+### canvas_pix
 
 ```lua
-canvas:pix(x: integer, y: integer, [color: color]) -> [integer]
+canvas_pix(id: integer, x: integer, y: integer, [color: color]) -> [integer]
 ```
 
 If the color is not specified, returns the color at (x,y). Otherwise, sets the pixel at (x,y) to `color`.
 
-This function is (or should be) more performant than `pix`, since `pix` has to roundtrip data to the GPU, while `canvas:pix` just has to store to image data on the CPU.
+This function is (or should be) more performant than `pix`, since `pix` has to roundtrip data to the GPU, while `canvas_pix` just has to store to image data on the CPU.
 
 ### circ
 
