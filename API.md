@@ -287,10 +287,12 @@ Clears the PCM channel of queued samples
 ### btn
 
 ```lua
-btn(id: integer)
+btn() -> integer
+btn(id: integer) -> boolean
 ```
 
-Gets the current state of the button with ID `id`.
+Gets the current state of the button with ID `id`. If `id` is not provided,
+then `btn` will return a bitfield of all of the buttons, with bits as listed below.
 
 |ID|Button|Keyboard mapping|
 |--|------|----------------|

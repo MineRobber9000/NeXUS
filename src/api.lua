@@ -474,10 +474,21 @@ end
 -- input functions
 local btnmapping = {[0]="up","down","left","right","z","x","lshift","return"}
 function api.btn(vm)
-    local id = tonumber(vm:checkinteger(1))
-    if id<0 or id>7 then vm:error("invalid button ID "..tostring(id)) end
-    vm:pushboolean(love.keyboard.isDown(btnmapping[id]))
-    return 1
+    if vm:isnoneornil(1) then
+        local n = 0
+        for i=0,#btnmapping do
+            if love.keyboard.isDown(btnmapping[id]) then
+                n=bit.band(n,bit.lshift(1,i))
+            end
+        end
+        vm:pushinteger(n)
+        return 1
+    else
+        local id = tonumber(vm:checkinteger(1))
+        if id<0 or id>7 then vm:error("invalid button ID "..tostring(id)) end
+        vm:pushboolean(love.keyboard.isDown(btnmapping[id]))
+        return 1
+    end
 end
 -- end input functions
 
